@@ -9,16 +9,25 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const navigation = useNavigation
+    const navigation = useNavigation()
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user =>{
             if(user){
-                navigation.navigate("Homescreen")
+                navigation.replace("Bottomtab")
             }
         })
         return unsubscribe
     }, [])
+
+    const handleLoginButtonPress = () => {
+        handleLogin(email, password);
+      };
+      
+      const handleSignUpButtonPress = () => {
+        handleSignUp(email, password);
+      };
+      
 
     
   return (
@@ -44,12 +53,12 @@ const Login = () => {
 
         <View style={styles.buttonContainer}>
             <TouchableOpacity
-            onPress={handleLogin}
+            onPress={handleLoginButtonPress}
             style= {styles.button}>
                 <Text style= {styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity
-            onPress={handleSignUp}
+            onPress={handleSignUpButtonPress}
             style= {[styles.button, styles.buttonOutline]}>
                 <Text style= {styles.buttonOutlineText}>Register</Text>
             </TouchableOpacity>
