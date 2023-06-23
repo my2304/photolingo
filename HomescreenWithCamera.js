@@ -5,6 +5,8 @@ import { Camera } from 'expo-camera';
 import { shareAsync } from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 
+
+
 const HomescreenWithCamera = () => {
 
     let cameraRef = useRef();
@@ -68,6 +70,7 @@ const HomescreenWithCamera = () => {
         </View>
         <StatusBar style="auto" />
       </Camera>
+      
     );
   }
   
