@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity} from 'react-native'
 import React from 'react'
 import { auth } from './firebase'
 import { NavigationContainer, useNavigation } from '@react-navigation/native'
@@ -6,36 +6,36 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native'
 // import * as Permissions from 'expo-permissions'
 import Bottomtab from './Bottomtab'
 
-// const HomeScreen = () => {
-//   const navigation = useNavigation()
 
-//   const handleSignOut = () => {
-//     auth
-//       .signOut()
-//       .then(() => {
-//         navigation.replace("Login")
-//       })
-//       .catch(error => alert(error.message))
-//   }
-
-//   return (
-//     <View style={styles.container}>
-//       <Text>Email: {auth.currentUser?.email}</Text>
-//       <TouchableOpacity
-//         onPress={handleSignOut}
-//         style={styles.button}
-//       >
-//         <Text style={styles.buttonText}>Sign out</Text>
-//       </TouchableOpacity>
-//     </View>
-//   )
-// }
 const HomeScreen = () => {
+  // return (
+  // <NavigationContainer>
+  //     <Bottomtab/>
+  //   </NavigationContainer>
+  // );
+
+  const navigation = useNavigation()
+
+  const handleSignOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        navigation.replace("Login")
+      })
+      .catch(error => alert(error.message))
+  }
+
   return (
-  <NavigationContainer>
-      <Bottomtab/>
-    </NavigationContainer>
-  );
+    <View style={styles.container}>
+      <Text>Email: {auth.currentUser?.email}</Text>
+      <TouchableOpacity
+        onPress={handleSignOut}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>Sign out</Text>
+      </TouchableOpacity>
+    </View>
+  )
   }
 export default HomeScreen
 
