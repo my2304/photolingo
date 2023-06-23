@@ -45,3 +45,4 @@ const handleLogin = async (email, password) => {
   
 
 export{auth, handleSignUp, handleLogin};
+
