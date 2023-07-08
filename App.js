@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Button, StatusBar, StyleSheet, Text, View, fetch } from 'react-native';
 
+//tensorflow
+import * as mobilenet from "@tensorflow-models/mobilenet";
+
 //IMPORT PHONE GALLERY
 import * as ImagePicker from 'expo-image-picker';
 
 import ResultsPage from './ResultsPage';
 
-//SELECTED IMAGE URL
-const [pickedImage, setPickedImage] = useState(null);
+
+//NEW CLASSIFY FUNCTION
+const classifyImage = async () => {
+    const results = await model.classify(pickedImage); //edit picked image to fulfil tensorflow reqs
+    setResults(results);
+}
 
 
-
-
+/* NYCKEL FUNCTIONS
 const fetchAccessToken = async () => {
   try {
     const response = await fetch('https://www.nyckel.com/connect/token', {
@@ -33,8 +39,9 @@ const fetchAccessToken = async () => {
     console.log('Error fetching access token:', error);
     return null;
   }
-};
+}; */
 
+/* OLD CLASSIFY FUNCTION
 const classifyImage = async (accessToken, imageBase64) => {
   try {
     const response = await fetch('https://api.nyckel.com/classify', {
@@ -58,15 +65,9 @@ const classifyImage = async (accessToken, imageBase64) => {
     console.log('Error classifying image:', error);
     return null;
   }
-};
+}; */
 
-export default function App() {
-  const [accessToken, setAccessToken] = useState(null);
-  const [classificationResult, setClassificationResult] = useState(null);
-  const [pickedImage, setPickedImage] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-
-
+/*
   useEffect(() => {
     const fetchToken = async () => {
       const token = await fetchAccessToken();
@@ -74,42 +75,89 @@ export default function App() {
     };
 
     fetchToken();
+  }, []); */
+
+  /*
+    const handleImageClassification = async () => {
+
+      if (!accessToken) {
+        console.log('Access token is not available');
+        return;
+      }
+
+      const result = await classifyImage(accessToken, pickedImage);
+      setClassificationResult(result);
+      setShowResults(true);
+
+
+    }; */
+
+
+export default function App() {
+//OLD
+  const [accessToken, setAccessToken] = useState(null);
+  const [classificationResult, setClassificationResult] = useState(null);
+  const [pickedImage, setPickedImage] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+
+//NEW
+  const [isModelLoading, setIsModelLoading] = useState(false);
+  const [model, setModel] = useState(null);
+  const [results, setResults] = useState([]);
+
+  const loadModel = async () => {
+    setIsModelLoading(true);
+    try {
+      const model = await mobilenet.load();
+      setModel(model);
+      setIsModelLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsModelLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadModel();
   }, []);
 
-  const handleImageClassification = async () => {
-
-    if (!accessToken) {
-      console.log('Access token is not available');
-      return;
-    }
-
-    const result = await classifyImage(accessToken, pickedImage);
-    setClassificationResult(result);
-    setShowResults(true);
-  };
+  if (isModelLoading) {
+      return (
+        <View>
+          <Text>Loading results...</Text>
+        </View>
+      );
+  }
+//END OF NEW
 
   //FUNCTION TO PICK IMAGE
   const pickImageFromGallery = async () => {
-    try {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      try {
+        const options = {
+          mediaType: 'photo', // Specify 'photo' or 'video' depending on your requirement
+          quality: 1, // Set the image quality (0 to 1)
+        };
 
-      if (!permissionResult.granted) {
-        throw new Error('Permission to access the gallery was denied');
+        const response = await launchImageLibrary(options);
+
+        if (response.didCancel) {
+          console.log('Image picking cancelled');
+        } else if (response.errorMessage) {
+          console.log('Error picking image:', response.errorMessage);
+        } else {
+          setPickedImage(response.uri);
+        }
+      } catch (error) {
+        console.log('Error picking image:', error);
       }
-
-      const pickerResult = await ImagePicker.launchImageLibraryAsync();
-
-      if (!pickerResult.cancelled) {
-        setPickedImage(pickerResult.uri);
-      }
-    } catch (error) {
-      console.log('Error picking image from gallery:', error);
-    }
   };
+
+
+
 
   if (showResults) {
       return (
-        <ResultsPage pickedImage={pickedImage} result={classificationResult} />
+        <ResultsPage pickedImage={pickedImage} result={results} />
       );
   }
 
@@ -123,9 +171,9 @@ export default function App() {
         />
       )}
 
-      <Button title="Pick Image" onPress={pickImageFromGallery} />
+      <Button title="Select Image" onPress={pickImageFromGallery} />
 
-      <Button title="Classify Image" onPress={handleImageClassification} />
+      <Button title="Classify Image" onPress={classifyImage} />
 
       <StatusBar style="auto" />
     </View>
@@ -140,3 +188,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
